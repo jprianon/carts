@@ -23,14 +23,13 @@ pipeline {
             }
         }
         
-        stage('Docker Push') {
+        stage('Push') {
             steps {
                 script {
-                    sh '''
-                    docker login -u $DOCKER_ID -p dckr_pat_KdmVj2VyGObjtG6RE-rvJqinXb0
-                    docker tag ${DOCKER_IMAGE} ${DOCKER_ID}/${DOCKER_IMAGE}
-                    docker push ${DOCKER_ID}/${DOCKER_IMAGE}:latest
-                    '''
+                    docker.withRegistry('', DOCKER_CREDENTIALS_ID) {
+                        dockerImage.push("${env.BUILD_ID}")
+                        dockerImage.push('latest')
+                    }
                 }
             }
         }
