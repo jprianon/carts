@@ -1,51 +1,109 @@
 pipeline {
     agent any
-
+    
     environment {
-        DOCKER_IMAGE = "docker push jprianon/sock-shop-carts"
-        DOCKER_CREDENTIALS_ID = '1dee9432-28cc-47b9-85af-c0e556775fd0'
+        DOCKER_ID = "jprianon"
+        DOCKER_IMAGE = "carts-service"  // Nom de l'image Docker spécifique au microservice
+        DOCKER_TAG = "v.${BUILD_ID}.0"
+        KUBECONFIG = "/home/ubuntu/.kube/config"
+        CHART_VERSION = '1.0.0'
     }
-
+    
     stages {
-        stage('Checkout') {
-            steps {
-                git 'https://github.com/jprianon/carts.git'
-            }
-        }
-
-        stage('Build') {
+        stage('Docker Build') {
             steps {
                 script {
-                    dockerImage = docker.build("${DOCKER_IMAGE}:${env.BUILD_ID}")
+                    sh '''
+                    ls
+                    git clone https://github.com/jprianon/carts.git
+                    docker rmi -f ${DOCKER_ID}/${DOCKER_IMAGE}
+                    docker build -t ${DOCKER_ID}/${DOCKER_IMAGE} .
+                    '''
+                }
+            }
+        }
+        
+        stage('Docker Push') {
+            steps {
+                script {
+                    sh '''
+                    docker login -u $DOCKER_ID -p dckr_pat_KdmVj2VyGObjtG6RE-rvJqinXb0
+                    docker tag ${DOCKER_IMAGE} ${DOCKER_ID}/${DOCKER_IMAGE}
+                    docker push ${DOCKER_ID}/${DOCKER_IMAGE}:latest
+                    '''
                 }
             }
         }
 
-        stage('Test') {
-            steps {
-                script {
-                    dockerImage.inside {
-                        sh 'pytest'
-                    }
-                }
-            }
-        }
-
-        stage('Push') {
-            steps {
-                script {
-                    docker.withRegistry('', DOCKER_CREDENTIALS_ID) {
-                        dockerImage.push("${env.BUILD_ID}")
-                        dockerImage.push('latest')
-                    }
-                }
-            }
-        }
-    }
-
-    post {
-        always {
-            cleanWs()
-        }
+        //stage('Deploy to Dev') {
+        //    environment {
+        //        KUBECONFIG = credentials("config")
+        //    }
+        //    steps {
+        //        script {
+        //            sh '''
+        //            rm -Rf .kube
+        //            mkdir .kube
+        //            cat $KUBECONFIG > .kube/config
+        //            helm upgrade --install carts-service-dev helmchart --namespace dev --values helmchart/values-dev.yaml
+        //            kubectl get deploy,svc,Pod -n dev
+        //            '''
+        //        }
+        //    }
+        //}
+//
+        //stage('Deploy to QA') {
+        //    environment {
+        //        KUBECONFIG = credentials("config")
+        //    }
+        //    steps {
+        //        script {
+        //            sh '''
+        //            rm -Rf .kube
+        //            mkdir .kube
+        //            cat $KUBECONFIG > .kube/config
+        //            helm upgrade --install carts-service-qa helmchart --namespace qa --values helmchart/values-qa.yaml
+        //            kubectl get deploy,svc,Pod -n qa
+        //            '''
+        //        }
+        //    }
+        //}
+//
+        //stage('Deploy to Staging') {
+        //    environment {
+        //        KUBECONFIG = credentials("config")
+        //    }
+        //    steps {
+        //        script {
+        //            sh '''
+        //            rm -Rf .kube
+        //            mkdir .kube
+        //            cat $KUBECONFIG > .kube/config
+        //            helm upgrade --install carts-service-staging helmchart --namespace staging --values helmchart/values-staging.yaml
+        //            kubectl get deploy,svc,Pod -n staging
+        //            '''
+        //        }
+        //    }
+        //}
+//
+        //stage('Manual Deployment to Production') {
+        //    when {
+        //        expression {
+        //            env.GIT_BRANCH == "main"
+        //        }
+        //    }
+        //    steps {
+        //        input message: 'Deploy to production environment?', ok: 'Yes'
+        //        script {
+        //            sh '''
+        //            rm -Rf .kube
+        //            mkdir .kube
+        //            cat $KUBECONFIG > .kube/config
+        //            helm upgrade --install carts-service-prod helmchart --namespace prod --values helmchart/values-prod.yaml
+        //            kubectl get deploy,svc,Pod -n prod
+        //            '''
+        //        }
+        //    }
+        //}
     }
 }
