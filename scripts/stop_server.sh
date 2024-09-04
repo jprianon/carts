@@ -1,0 +1,1 @@
+echo "Stop" > /opt/stop.txt
