@@ -1,1 +1,1 @@
-echo "Start" > /opt/start.txt
+echo "Start blabla" > /opt/start.txt
