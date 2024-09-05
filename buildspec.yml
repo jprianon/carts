@@ -3,6 +3,6 @@ version: 0.2
 artifacts:
   files:
     - '**/*'
-  base-directory: BuildArti
+  base-directory: SourceArti
   name: build-artifact-name
   discard-paths: no
