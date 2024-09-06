@@ -10,14 +10,6 @@
 version: 0.2
 
 phases:
-  install:
-    commands:
-    - sudo apt-get update
-    - echo Installing AWS 
-    - sudo apt-get install -y aws-cli
-    - echo Installing Docker...
-    - sudo apt-get install -y docker
-    - service docker start
   pre_build:
     commands:
       - echo "AWS_DEFAULT_REGION=$AWS_DEFAULT_REGION"
