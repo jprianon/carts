@@ -13,4 +13,4 @@ RUN chmod 755 /usr/src/app
 ENV JAVA_OPTS="-Xms64m -Xmx128m -XX:+UseG1GC -Djava.security.egd=file:/dev/urandom -Dspring.zipkin.enabled=false"
 
 # Container settings
-
+CMD ["java", "-jar", "carts.jar"]
