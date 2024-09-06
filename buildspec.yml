@@ -12,7 +12,7 @@ version: 0.2
 phases:
   install:
     commands:
-    - Installing AWS 
+    - echo Installing AWS 
     - yum install -y aws-cli
     - echo Installing Docker...
     - yum install -y docker
