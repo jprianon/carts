@@ -10,8 +10,17 @@
 version: 0.2
 
 phases:
+  install:
+    commands:
+    - Installing AWS 
+    - yum install -y aws-cli
+    - echo Installing Docker...
+    - yum install -y docker
+    - service docker start
   pre_build:
     commands:
+      - echo "AWS_DEFAULT_REGION=$AWS_DEFAULT_REGION"
+      - echo "AWS_ACCOUNT_ID=$AWS_ACCOUNT_ID"
       - echo Logging in to Amazon ECR...
       - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
   build:
