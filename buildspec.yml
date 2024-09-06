@@ -11,11 +11,18 @@ version: 0.2
 
 phases:
   install:
-    commands:
-      - echo Installing Docker...
-      - service docker start  # Démarrer Docker
+      runtime-versions:
+        docker: latest
   pre_build:
     commands:
+      # This Docker Image tag will have date, time and Codecommit version
+      - TAG="$(date +%Y-%m-%d.%H.%M.%S).$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | head -c 8)"
+      # Check AWS CLI Version        
+      - echo "Checking AWS CLI Version..."
+      - aws --version
+      # Login to ECR Registry 
+      - echo "Logging in to Amazon ECR..."
+      - $(aws ecr get-login --no-include-email --region eu-west-1)
       - echo "AWS_DEFAULT_REGION=$AWS_DEFAULT_REGION"
       - echo "AWS_ACCOUNT_ID=$AWS_ACCOUNT_ID"
       - echo Logging in to Amazon ECR...
