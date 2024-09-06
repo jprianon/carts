@@ -12,11 +12,11 @@ version: 0.2
 phases:
   install:
     commands:
-    - apt-get update
+    - sudo apt-get update
     - echo Installing AWS 
-    - apt-get install -y aws-cli
+    - sudo apt-get install -y aws-cli
     - echo Installing Docker...
-    - apt-get install -y docker
+    - sudo apt-get install -y docker
     - service docker start
   pre_build:
     commands:
